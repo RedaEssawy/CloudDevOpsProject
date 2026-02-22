@@ -1,0 +1,6 @@
+---
+- name: Install Prereqisits
+  become: yes
+  hosts: all
+  roles:
+    - roles/ivolve-graduation-project

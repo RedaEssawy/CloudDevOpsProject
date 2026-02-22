@@ -1,0 +1,16 @@
+
+plugin: amazon.aws.aws_ec2
+regions:
+  - us-east-1
+filters:
+  instance-state-name: running
+
+# hostnames:
+#   - public-dns-name
+
+vars:
+  ansible_user: ubuntu
+  ansible_ssh_private_key_file: /home/reda/.ssh/ansible-key.pem
+
+# remote_user: ubuntu
+# private_key_file: ~/.ssh/new-key.pem
