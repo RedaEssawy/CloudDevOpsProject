@@ -15,11 +15,11 @@ pipeline{
     stages {
         stage('Checkout') {
             steps {
-                dir('../docker/FinalProject') {
-                    
-                sh 'pwd'
                 checkout scm
+                dir("../docker/FinalProject") {
                 script {
+                    sh "pwd"
+                    sh "ls -la"
                     // Verify Python files exist
                     if (!fileExists('app.py')) {
                         error "app.py not found!"
