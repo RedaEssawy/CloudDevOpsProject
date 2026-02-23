@@ -15,9 +15,9 @@ pipeline{
     stages {
         stage('Checkout') {
             steps {
-                dir("../docker/FinalProject/") {
+                dir('../docker/FinalProject') {
                     
-                
+                sh 'pwd'
                 checkout scm
                 script {
                     // Verify Python files exist
