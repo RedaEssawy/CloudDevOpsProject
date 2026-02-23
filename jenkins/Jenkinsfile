@@ -55,22 +55,22 @@ pipeline{
                 stage('Unit Tests') {
                     steps {
                         dir("docker/FinalProject") {
-                        container('python') {
+                        
                             sh '''
                                 python -m pytest tests/ -v --cov=. --cov-report=xml
                             '''
-                        }
+                        
                     }}
                 }
                 stage('Lint Check') {
                     steps {
                         dir("docker/FinalProject") {
-                        container('python') {
+                        
                             sh '''
                                 flake8 app.py --max-line-length=120
                                 flake8 static/ templates/ --max-line-length=120
                             '''
-                        }}
+                        }
                     }
                 }
             }
