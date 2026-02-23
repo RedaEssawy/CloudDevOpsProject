@@ -53,7 +53,7 @@ pipeline{
 
         stage('Run Tests') {
             steps {
-                dir("docker/FinalProject") {
+                dir("../docker/FinalProject") {
                     
                 
                 sh '''
@@ -65,7 +65,7 @@ pipeline{
 
         stage('Lint Code') {
             steps {
-                dir("docker/FinalProject") {
+                dir("../docker/FinalProject") {
                 sh '''
                     . venv/bin/activate
                     flake8 .
@@ -75,7 +75,7 @@ pipeline{
 
         stage('Security Scan - Bandit') {
             steps {
-                dir("docker/FinalProject") {
+                dir("../docker/FinalProject") {
                     
                 
                 sh '''
