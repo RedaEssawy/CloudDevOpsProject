@@ -1,0 +1,134 @@
+@Library('vars') _
+pipeline{
+      agent { label 'ubuntu-agent' }
+
+
+    environment {
+        APP_NAME="Python-App"
+        IMAGE_NAME="redaeid/ivolvefinalproject"
+        DEPLOYMENT_FILE="deployment.yaml"
+        DOCKERHUB_CREDENTIALS='dockerHub-credentials'
+        API_SERVER='APIServer'
+        SERVICEACCOUNT_TOKEN='ServiceAccount-Token'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                dir("../docker/FinalProject") {
+                    
+                
+                checkout scm
+                script {
+                    // Verify Python files exist
+                    if (!fileExists('app.py')) {
+                        error "app.py not found!"
+                    }
+                    if (!fileExists('requirements.txt')) {
+                        error "requirements.txt not found!"
+                    }
+                }
+            }}
+        }
+
+       stage('Install Dependencies') {
+            steps {
+                dir("../docker/FinalProject") {
+                    
+                
+                sh '''
+                    python3 -m venv venv
+                    . venv/bin/activate
+                    pip install --upgrade pip
+                    pip install -r requirements.txt
+                    pip install pytest flake8 bandit
+                '''
+            }}
+        }
+
+        stage('Run Tests') {
+            steps {
+                dir("../docker/FinalProject") {
+                    
+                
+                sh '''
+                    . venv/bin/activate
+                    pytest
+                '''
+            }}
+        }
+
+        stage('Lint Code') {
+            steps {
+                dir("../docker/FinalProject") {
+                sh '''
+                    . venv/bin/activate
+                    flake8 .
+                '''
+            }
+        }}
+
+        stage('Security Scan - Bandit') {
+            steps {
+                dir("../docker/FinalProject") {
+                    
+                
+                sh '''
+                    . venv/bin/activate
+                    bandit -r app/
+                '''
+            }}
+        }
+
+      
+       
+        stage('Build and Push Docker Image') {
+            steps {
+                dir("../docker/FinalProject") {
+                buildAndPushImage(IMAGE_NAME,DOCKERHUB_CREDENTIALS)
+            }
+        }}
+        stage('Docker Image Security Scan') {
+         steps {
+             script {
+                 echo "Scanning Docker image with Trivy..."
+
+                 sh "trivy  --scanners vuln --skip-version-check image $IMAGE_NAME:$BUILD_NUMBER  || true"   
+             }
+         }
+            }       
+
+       
+        stage('Delete Local Docker Image') {
+            steps {
+                sh "docker rmi $IMAGE_NAME:$BUILD_NUMBER || true"
+            }
+        }
+       
+        stage('Deploy to Kubernetes') {
+            
+            steps {
+                dir('../kubernetes') {
+                deployOnK8S(API_SERVER,SERVICEACCOUNT_TOKEN,IMAGE_NAME,DEPLOYMENT_FILE)
+            }
+        }
+        }
+        
+         
+    }
+    post {
+          always {
+            echo "Cleaning up workspace..."
+        
+    }
+        success{
+            echo "Pipeline succeeded."
+        }
+        failure{
+            echo "Pipeline failed."
+           
+        }
+    }
+
+
+}
