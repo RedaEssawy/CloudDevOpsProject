@@ -1,6 +1,6 @@
 @Library('vars') _
 pipeline{
-      agent { label 'ubuntu-agent' }
+      agent any
 
 
     environment {
