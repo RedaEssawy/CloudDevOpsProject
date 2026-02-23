@@ -18,15 +18,11 @@ pipeline{
                 checkout scm
 
                 script {
-            
-                
-                    sh "pwd"
-                    sh "ls -la"
                     // Verify Python files exist
-                    if (!fileExists('app.py')) {
+                    if (!fileExists('docker/FinalProject/app.py')) {
                         error "app.py not found!"
                     }
-                    if (!fileExists('requirements.txt')) {
+                    if (!fileExists('docker/FinalProject/requirements.txt')) {
                         error "requirements.txt not found!"
                     
                 }}
