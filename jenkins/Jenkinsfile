@@ -50,29 +50,30 @@ pipeline{
                 '''
             }}
         }
-
-        stage('Run Tests') {
-            steps {
-                dir("docker/FinalProject") {
-                    
-                
-                sh '''
-                    . venv/bin/activate
-                    pytest
-                '''
-            }}
-        }
-
-        stage('Lint Code') {
-            steps {
-                dir("docker/FinalProject") {
-                sh '''
-                    . venv/bin/activate
-                    flake8 .
-                '''
+                 stage('Run Tests') {
+            parallel {
+                stage('Unit Tests') {
+                    steps {
+                        container('python') {
+                            sh '''
+                                python -m pytest tests/ -v --cov=. --cov-report=xml
+                            '''
+                        }
+                    }
+                }
+                stage('Lint Check') {
+                    steps {
+                        container('python') {
+                            sh '''
+                                flake8 app.py --max-line-length=120
+                                flake8 static/ templates/ --max-line-length=120
+                            '''
+                        }
+                    }
+                }
             }
-        }}
-
+        }
+       
         stage('Security Scan - Bandit') {
             steps {
                 dir("docker/FinalProject") {
