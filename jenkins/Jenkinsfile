@@ -19,10 +19,10 @@ pipeline{
 
                 script {
                     // Verify Python files exist
-                    if (!fileExists('docker/FinalProject/app.py')) {
+                    if (!fileExists('../docker/FinalProject/app.py')) {
                         error "app.py not found!"
                     }
-                    if (!fileExists('docker/FinalProject/requirements.txt')) {
+                    if (!fileExists('../docker/FinalProject/requirements.txt')) {
                         error "requirements.txt not found!"
                     
                 }}
