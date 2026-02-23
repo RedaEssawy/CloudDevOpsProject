@@ -18,7 +18,7 @@ pipeline{
                 checkout scm
 
                 script {
-                    dir("../docker/FinalProject") {
+                    dir("docker/FinalProject") {
                 
                     sh "pwd"
                     sh "ls -la"
