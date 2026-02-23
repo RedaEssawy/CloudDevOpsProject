@@ -16,8 +16,9 @@ pipeline{
         stage('Checkout') {
             steps {
                 checkout scm
-                dir("../docker/FinalProject") {
+
                 script {
+                    sh 'cd ../docker/FinalProject'
                     sh "pwd"
                     sh "ls -la"
                     // Verify Python files exist
@@ -26,7 +27,7 @@ pipeline{
                     }
                     if (!fileExists('requirements.txt')) {
                         error "requirements.txt not found!"
-                    }
+                    
                 }
             }}
         }
