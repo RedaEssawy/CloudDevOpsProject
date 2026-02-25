@@ -3,7 +3,7 @@ pipeline {
     agent any
     
     environment {
-        APP_NAME = "CloudDevOpsApp"
+        APP_NAME = "ivolvefinalproject"  // Update with your app name
         IMAGE_NAME = "redaeid/${APP_NAME}"  // You can modify this
         DOCKERHUB_CREDENTIALS = 'dockerHub-credentials'
         DEPLOYMENT_FILE = "kubernetes/deployment.yaml"
