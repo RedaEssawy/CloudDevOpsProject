@@ -17,16 +17,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 
 # Copy requirements
-RUN ls FinalProject/
-COPY FinalProject/requirements.txt .
+
+COPY . .
 
 # Install python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code 
-COPY FinalProject/app.py .
-COPY FinalProject/static/ ./static/
-COPY FinalProject/templates/ ./templates/
 
 # Create non-root user 
 RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser && chown -R appuser:appgroup /app
