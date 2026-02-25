@@ -17,7 +17,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 
 # Copy requirements
-COPY docker/FinalProject/requirements.txt .
+RUN ls FinalProject/
+COPY FinalProject/requirements.txt .
 
 # Install python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
