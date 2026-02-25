@@ -101,7 +101,7 @@ pipeline {
             steps {
                 script {
                     echo "Updating Kubernetes manifests with new image tag..."
-                    dir('kubernetes') {
+                    
                     updateManifests(
                         // manifestsRepo: MANIFESTS_REPO,
                         // branch: MANIFESTS_BRANCH,
@@ -110,7 +110,7 @@ pipeline {
                         deploymentFile: DEPLOYMENT_FILE,
                         // credentialsId: GIT_CREDENTIALS_ID
                     )
-                }
+                
             }
         }}
 
