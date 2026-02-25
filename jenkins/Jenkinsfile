@@ -1,6 +1,6 @@
 @Library('shared-library') _
 pipeline {
-    agent { label 'ubuntu-agent' }
+    agent any
     
     environment {
         APP_NAME = "Flask-Web-App"
