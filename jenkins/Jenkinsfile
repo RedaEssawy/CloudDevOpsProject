@@ -101,6 +101,7 @@ pipeline {
             steps {
                 script {
                     echo "Updating Kubernetes manifests with new image tag..."
+                    sh "pwd && ls -la"
                     
                     updateManifests(
                         // manifestsRepo: MANIFESTS_REPO,
