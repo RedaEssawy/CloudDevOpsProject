@@ -39,14 +39,14 @@ pipeline {
             steps {
                 script {
                     echo "Building Docker image: ${IMAGE_NAME}:${BUILD_NUMBER}"
-                    dir('docker) {
+                
                         buildDockerImage(
                             imageName: IMAGE_NAME,
                             tag: BUILD_NUMBER,
-                            dockerfilePath: 'Dockerfile',
+                            dockerfilePath: 'docker/Dockerfile',
                             buildContext: '.',
                         )
-                    }
+                    
                 }
             }
         }
