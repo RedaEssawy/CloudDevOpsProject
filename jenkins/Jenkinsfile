@@ -44,7 +44,7 @@ pipeline {
                             imageName: IMAGE_NAME,
                             tag: BUILD_NUMBER,
                             dockerfilePath: '../docker/Dockerfile',
-                            buildContext: '.'
+                            buildContext: 'docker/FinalProject'
                         )
                     }
                 }
