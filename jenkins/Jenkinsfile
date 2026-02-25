@@ -1,142 +1,146 @@
-@Library('vars') _
-pipeline{
-      agent any
-
-
+@Library('shared-library') _
+pipeline {
+    agent { label 'ubuntu-agent' }
+    
     environment {
-        APP_NAME="Python-App"
-        IMAGE_NAME="redaeid/ivolvefinalproject"
-        DEPLOYMENT_FILE="deployment.yaml"
-        DOCKERHUB_CREDENTIALS='dockerHub-credentials'
-        API_SERVER='APIServer'
-        SERVICEACCOUNT_TOKEN='ServiceAccount-Token'
+        APP_NAME = "Flask-Web-App"
+        IMAGE_NAME = "redaeid/flask-app"  // You can modify this
+        DOCKERHUB_CREDENTIALS = 'dockerHub-credentials'
+        DEPLOYMENT_FILE = "deployment.yaml"
+        MANIFESTS_REPO = "git@github.com:yourusername/k8s-manifests.git"  // Update with your manifests repo
+        MANIFESTS_BRANCH = "main"
+        GIT_CREDENTIALS_ID = 'github-credentials'
+        API_SERVER = 'APIServer'
+        SERVICEACCOUNT_TOKEN = 'ServiceAccount-Token'
+        // For Trivy scan
+        TRIVY_IGNORE_UNFIXED = 'true'
+        TRIVY_SEVERITY = 'CRITICAL,HIGH'
     }
 
     stages {
-        
-          stage('Checkout') {
-              steps {
-                  checkout scm
-          
-                  script {
-                      dir("docker/FinalProject") {
-          
-                          sh "pwd"
-                          sh "ls -la"
-          
-                          if (!fileExists('app.py')) {
-                              error "app.py not found!"
-                          }
-          
-                          if (!fileExists('requirements.txt')) {
-                              error "requirements.txt not found!"
-                          }
-                      }
-                  }
-                 }
-                 }
-
-       stage('Install Dependencies') {
+        stage('Setup Environment') {
             steps {
-                dir("docker/FinalProject") {
-                    
-                
-                sh '''
-                    python3 -m venv venv
-                    . venv/bin/activate
-                    pip install --upgrade pip
-                    pip install -r requirements.txt
-                    pip install pytest flake8 bandit
-                '''
-            }}
+                dir('docker/FinalProject') {
+                script {
+                    echo "Setting up Python environment..."
+                    sh '''
+                        python3 -m venv venv
+                        . venv/bin/activate
+                        pip install --upgrade pip
+                        if [ -f FinalProject/requirements.txt ]; then
+                            pip install -r FinalProject/requirements.txt
+                        fi
+                    '''
+                }}
+            }
         }
-                 stage('Run Tests') {
-            parallel {
-                stage('Unit Tests') {
-                    steps {
-                        dir("docker/FinalProject") {
-                        
-                            sh '''
-                                python -m pytest tests/ -v --cov=. --cov-report=xml
-                            '''
-                        
-                    }}
-                }
-                stage('Lint Check') {
-                    steps {
-                        dir("docker/FinalProject") {
-                        
-                            sh '''
-                                flake8 app.py --max-line-length=120
-                                flake8 static/ templates/ --max-line-length=120
-                            '''
-                        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    echo "Building Docker image: ${IMAGE_NAME}:${BUILD_NUMBER}"
+                    dir('docker/FinalProject') {
+                        buildDockerImage(
+                            imageName: IMAGE_NAME,
+                            tag: BUILD_NUMBER,
+                            dockerfilePath: '../Dockerfile',
+                            buildContext: '.'
+                        )
                     }
                 }
             }
         }
-       
-        stage('Security Scan - Bandit') {
+
+        stage('Scan Docker Image') {
             steps {
-                dir("docker/FinalProject") {
-                    
-                
-                sh '''
-                    . venv/bin/activate
-                    bandit -r app/
-                '''
-            }}
+                script {
+                    echo "Scanning Docker image with Trivy..."
+                    // Using shared library function for image scanning
+                    scanDockerImage(
+                        imageName: IMAGE_NAME,
+                        tag: BUILD_NUMBER,
+                        severity: TRIVY_SEVERITY,
+                        ignoreUnfixed: TRIVY_IGNORE_UNFIXED
+                    )
+                }
+            }
         }
 
-      
-       
-        stage('Build and Push Docker Image') {
+        stage('Push Docker Image') {
             steps {
-                dir("docker/FinalProject") {
-                buildAndPushImage(IMAGE_NAME,DOCKERHUB_CREDENTIALS)
+                script {
+                    echo "Pushing Docker image to registry..."
+                    pushDockerImage(
+                        imageName: IMAGE_NAME,
+                        tag: BUILD_NUMBER,
+                        credentialsId: DOCKERHUB_CREDENTIALS
+                    )
+                    
+                    // Also tag and push as 'latest'
+                    sh """
+                        docker tag ${IMAGE_NAME}:${BUILD_NUMBER} ${IMAGE_NAME}:latest
+                        docker push ${IMAGE_NAME}:latest
+                    """
+                }
             }
-        }}
-        stage('Docker Image Security Scan') {
-         steps {
-             script {
-                 echo "Scanning Docker image with Trivy..."
+        }
 
-                 sh "trivy  --scanners vuln --skip-version-check image $IMAGE_NAME:$BUILD_NUMBER  || true"   
-             }
-         }
-            }       
-
-       
         stage('Delete Local Docker Image') {
             steps {
-                sh "docker rmi $IMAGE_NAME:$BUILD_NUMBER || true"
+                script {
+                    echo "Cleaning up local Docker images..."
+                    sh """
+                        docker rmi ${IMAGE_NAME}:${BUILD_NUMBER} || true
+                        docker rmi ${IMAGE_NAME}:latest || true
+                    """
+                }
             }
         }
-       
-        stage('Deploy to Kubernetes') {
-            
+
+        stage('Update Manifests') {
             steps {
-                dir('kubernetes') {
-                deployOnK8S(API_SERVER,SERVICEACCOUNT_TOKEN,IMAGE_NAME,DEPLOYMENT_FILE)
+                script {
+                    echo "Updating Kubernetes manifests with new image tag..."
+                    dir('kubernetes') {
+                    updateManifests(
+                        // manifestsRepo: MANIFESTS_REPO,
+                        // branch: MANIFESTS_BRANCH,
+                        imageName: IMAGE_NAME,
+                        newTag: BUILD_NUMBER,
+                        deploymentFile: DEPLOYMENT_FILE,
+                        // credentialsId: GIT_CREDENTIALS_ID
+                    )
+                }
             }
-        }
-        }
-        
-         
+        }}
+
+        // stage('Push Manifests') {
+        //     steps {
+        //         script {
+        //             echo "Pushing updated manifests to repository..."
+        //             pushManifests(
+        //                 manifestsRepo: MANIFESTS_REPO,
+        //                 branch: MANIFESTS_BRANCH,
+        //                 credentialsId: GIT_CREDENTIALS_ID,
+        //                 commitMessage: "Update image tag to ${BUILD_NUMBER} for ${APP_NAME}"
+        //             )
+        //         }
+        //     }
+        // }
     }
+
     post {
-          always {
+        always {
             echo "Cleaning up workspace..."
-        
-    }
-        success{
-            echo "Pipeline succeeded."
+            cleanWs()
         }
-        failure{
-            echo "Pipeline failed."
-           
+        success {
+            echo "Pipeline completed successfully! Image ${IMAGE_NAME}:${BUILD_NUMBER} has been built, scanned, and pushed."
+            // You can add notifications here if needed
+        }
+        failure {
+            echo "Pipeline failed. Please check the logs for details."
+            // You can add failure notifications here
         }
     }
-
-
 }
