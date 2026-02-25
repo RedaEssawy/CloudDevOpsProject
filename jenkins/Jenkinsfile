@@ -43,8 +43,8 @@ pipeline {
                         buildDockerImage(
                             imageName: IMAGE_NAME,
                             tag: BUILD_NUMBER,
-                            dockerfilePath: './Dockerfile',
-                            buildContext: './FinalProject',
+                            dockerfilePath: 'Dockerfile',
+                            buildContext: '.',
                         )
                     }
                 }
