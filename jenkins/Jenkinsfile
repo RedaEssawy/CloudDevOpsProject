@@ -111,18 +111,22 @@ pipeline {
                         deploymentFile: DEPLOYMENT_FILE,
                         // credentialsId: GIT_CREDENTIALS_ID
                     )
+                    echo "updated deployment.yaml in project repo"
+                    sh "cat ${DEPLOYMENT_FILE} | grep 'image:'"
                 
             }
         }}
 
-        stage('Push Manifests') {
+        stage('Push Manifests to Separate Repo') {
             steps {
                 script {
-                    echo "Pushing updated manifests to repository..."
+                    echo "Pushing updated manifests to separate repository..."
                     pushManifests(
                         manifestsRepo: MANIFESTS_REPO,
                         branch: MANIFESTS_BRANCH,
                         credentialsId: GIT_CREDENTIALS_ID,
+                        sourceDeploymentFile: DEPLOYMENT_FILE,
+                        targetDeploymentFile: 'kubernetes/deployment.yaml', 
                         commitMessage: "Update image tag to ${BUILD_NUMBER} for ${APP_NAME}"
                     )
                 }
