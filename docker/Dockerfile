@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Copy requirements
 
-COPY FinalProject/ .
+COPY . .
 
 # Install python dependencies
 
