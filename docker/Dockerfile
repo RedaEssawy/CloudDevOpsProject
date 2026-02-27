@@ -22,7 +22,8 @@ COPY . .
 
 # Install python dependencies
 
-RUN pip install flask && \
+RUN pip install --upgrade pip && \
+pip install flask && \
     pip install gunicorn 
     
 
