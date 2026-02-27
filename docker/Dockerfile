@@ -21,7 +21,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY . .
 
 # Install python dependencies
-RUN pip install --no-cache-dir -r app/FinalProject/requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 
 # Create non-root user 
