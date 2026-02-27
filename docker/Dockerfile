@@ -18,11 +18,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Copy requirements
 
-COPY . .
+COPY FinalProject/* .
 
 # Install python dependencies
-RUN "ls -la /app"
-RUN "pwd"
 
 RUN pip install --no-cache-dir -r requirements.txt
 
