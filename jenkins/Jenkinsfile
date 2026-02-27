@@ -15,6 +15,7 @@ pipeline {
         // For Trivy scan
         TRIVY_IGNORE_UNFIXED = 'true'
         TRIVY_SEVERITY = 'CRITICAL,HIGH'
+        GITHUB_TOKEN_CREDENTIALS = 'github-token' // For pushing to GitHub if needed
     }
 
     stages {
@@ -124,7 +125,7 @@ pipeline {
                     pushManifests(
                         manifestsRepo: MANIFESTS_REPO,
                         branch: MANIFESTS_BRANCH,
-                        credentialsId: GIT_CREDENTIALS_ID,
+                        credentialsId: GITHUB_TOKEN_CREDENTIALS,
                         sourceDeploymentFile: DEPLOYMENT_FILE,
                         targetDeploymentFile: 'kubernetes/deployment.yaml', 
                         commitMessage: "Update image tag to ${BUILD_NUMBER} for ${APP_NAME}"
