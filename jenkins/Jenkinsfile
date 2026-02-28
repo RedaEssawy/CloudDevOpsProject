@@ -5,7 +5,8 @@ pipeline {
     environment {
         APP_NAME = "ivolvefinalproject"  // Update with your app name
         IMAGE_NAME = "redaeid/${APP_NAME}"  // You can modify this
-        DOCKERHUB_CREDENTIALS = 'dockerHub-credentials'
+        DOCKERHUB_CREDENTIALS = "dockerHub-credentials"
+
         DEPLOYMENT_FILE = "kubernetes/deployment.yaml"
         MANIFESTS_REPO = "https://github.com/RedaEssawy/Argocd-yaml-iVolve-graduation-project.git" // Update with your manifests repo
         MANIFESTS_BRANCH = "main"
