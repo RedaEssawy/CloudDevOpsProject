@@ -18,16 +18,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Copy requirements
 
-COPY . .
+COPY FinalProject/requirements.txt /app/requirements.txt
 
 # Install python dependencies
 
 RUN pip install --upgrade pip && \
-pip install flask && \
-    pip install gunicorn 
+pip install -r /app/requirements.txt 
     
 
-
+COPY FinalProject/ .
 
 # Create non-root user 
 RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser && chown -R appuser:appgroup /app
