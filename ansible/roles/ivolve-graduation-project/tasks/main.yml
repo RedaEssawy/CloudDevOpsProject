@@ -55,3 +55,58 @@
   apt:
     name: python3-boto3
     state: present
+
+- name: Create directory for apt keyrings
+  file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+
+- name: Download Jenkins repository key
+  get_url:
+    url: https://pkg.jenkins.io/debian-stable/jenkins.io-2026.key
+    dest: /etc/apt/keyrings/jenkins-keyring.asc
+    mode: '0644'
+
+- name: Add Jenkins repository
+  apt_repository:
+    repo: "deb [signed-by=/etc/apt/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/"
+    state: present
+    update_cache: yes
+
+- name: Install Java runtime (required for Jenkins)
+  apt:
+    name: fontconfig
+    state: present
+
+- name: Install Java (OpenJDK 21 JRE)
+  apt:
+    name: openjdk-21-jre
+    state: present
+
+- name: Install Jenkins
+  apt:
+    name: jenkins
+    state: present
+    update_cache: yes
+
+- name: Start Jenkins service
+  systemd:
+    name: jenkins
+    state: started
+    enabled: yes
+
+- name: Wait for Jenkins to start up
+  wait_for:
+    port: 8080
+    delay: 10
+    timeout: 300
+
+- name: Get the initial admin password
+  slurp:
+    src: /var/lib/jenkins/secrets/initialAdminPassword
+  register: initial_admin_password_encoded
+
+- name: Display Jenkins initial admin password
+  debug:
+    msg: "Jenkins initial admin password: {{ initial_admin_password_encoded['content'] | b64decode }}"
