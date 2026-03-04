@@ -1,0 +1,141 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  creationTimestamp: "2026-03-02T13:42:54Z"
+  generation: 189
+  name: ivolve
+  namespace: argocd
+  resourceVersion: "42047"
+  uid: 2f700171-78d8-4cdd-b21f-91d4f9bedc67
+spec:
+  destination:
+    namespace: ivolve
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: kubernetes
+    repoURL: https://github.com/RedaEssawy/Argocd-yaml-iVolve-graduation-project.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      enabled: true
+      prune: true
+      selfHeal: true
+status:
+  conditions:
+  - lastTransitionTime: "2026-03-02T18:20:48Z"
+    message: 'Failed to load target state: failed to generate manifest for source
+      1 of 1: rpc error: code = Unavailable desc = connection error: desc = "transport:
+      Error while dialing: dial tcp 10.98.47.13:8081: connect: connection refused"'
+    type: ComparisonError
+  controllerNamespace: argocd
+  health:
+    lastTransitionTime: "2026-03-02T14:04:53Z"
+    status: Healthy
+  history:
+  - deployStartedAt: "2026-03-02T13:43:04Z"
+    deployedAt: "2026-03-02T13:43:04Z"
+    id: 0
+    initiatedBy:
+      automated: true
+    revision: 7b861dde24625edbea181439341b8765d9a1ca34
+    source:
+      path: kubernetes
+      repoURL: https://github.com/RedaEssawy/Argocd-yaml-iVolve-graduation-project.git
+      targetRevision: HEAD
+  - deployStartedAt: "2026-03-02T14:02:27Z"
+    deployedAt: "2026-03-02T14:02:28Z"
+    id: 1
+    initiatedBy:
+      automated: true
+    revision: 735c13ae692267dc5de20ac4898096f1f7ec12f3
+    source:
+      path: kubernetes
+      repoURL: https://github.com/RedaEssawy/Argocd-yaml-iVolve-graduation-project.git
+      targetRevision: HEAD
+  - deployStartedAt: "2026-03-02T14:04:51Z"
+    deployedAt: "2026-03-02T14:04:51Z"
+    id: 2
+    initiatedBy:
+      automated: true
+    revision: 2efa1f8f88c3cb25719530d2f2220fdf4ef7b60b
+    source:
+      path: kubernetes
+      repoURL: https://github.com/RedaEssawy/Argocd-yaml-iVolve-graduation-project.git
+      targetRevision: HEAD
+  operationState:
+    finishedAt: "2026-03-02T14:04:51Z"
+    message: successfully synced (all tasks run)
+    operation:
+      initiatedBy:
+        automated: true
+      retry:
+        limit: 5
+      sync:
+        autoHealAttemptsCount: 1
+        prune: true
+        resources:
+        - group: apps
+          kind: Deployment
+          name: cloud-devops-deployment
+        revision: 2efa1f8f88c3cb25719530d2f2220fdf4ef7b60b
+        source:
+          path: kubernetes
+          repoURL: https://github.com/RedaEssawy/Argocd-yaml-iVolve-graduation-project.git
+          targetRevision: HEAD
+    phase: Succeeded
+    startedAt: "2026-03-02T14:04:51Z"
+    syncResult:
+      resources:
+      - group: apps
+        hookPhase: Running
+        images:
+        - redaeid/ivolvefinalproject:78
+        kind: Deployment
+        message: deployment.apps/cloud-devops-deployment configured
+        name: cloud-devops-deployment
+        namespace: ivolve
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      revision: 2efa1f8f88c3cb25719530d2f2220fdf4ef7b60b
+      source:
+        path: kubernetes
+        repoURL: https://github.com/RedaEssawy/Argocd-yaml-iVolve-graduation-project.git
+        targetRevision: HEAD
+  reconciledAt: "2026-03-04T11:57:43Z"
+  resourceHealthSource: appTree
+  resources:
+  - kind: Namespace
+    name: ivolve
+    requiresPruning: true
+    status: Unknown
+    version: v1
+  - kind: Service
+    name: flask-app-service
+    namespace: ivolve
+    requiresPruning: true
+    status: Unknown
+    version: v1
+  - group: apps
+    kind: Deployment
+    name: cloud-devops-deployment
+    namespace: ivolve
+    requiresPruning: true
+    status: Unknown
+    version: v1
+  sourceHydrator: {}
+  summary:
+    images:
+    - redaeid/ivolvefinalproject:78
+  sync:
+    comparedTo:
+      destination:
+        namespace: ivolve
+        server: https://kubernetes.default.svc
+      source:
+        path: kubernetes
+        repoURL: https://github.com/RedaEssawy/Argocd-yaml-iVolve-graduation-project.git
+        targetRevision: HEAD
+    revision: HEAD
+    status: Unknown
